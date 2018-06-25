@@ -5,7 +5,7 @@ from keras.utils import Sequence
 from keras.preprocessing.image import ImageDataGenerator
 import os
 import skimage.io as io
-
+import skimage.transform as trans
 
 class TrainSequence(Sequence):
     """
@@ -63,6 +63,12 @@ def adjust_data(img, mask):
     mask = mask / 255
     mask[mask > 0.5] = 1
     mask[mask <= 0.5] = 0
+
+    # Sanity Check: Display Image
+    # print(img.shape)
+    # io.imshow(img[0][:, :, 0])
+    # io.imshow(mask[0][:, :, 0])
+    # io.show()
     return (img, mask)
 
 
@@ -101,20 +107,39 @@ def trainGenerator(batch_size, train_path, image_folder, mask_folder, aug_dict, 
         img, mask = adjust_data(img, mask)
         yield (img, mask)
 
-def test_seq_generator(img_path, batch_size=32, img_size=256):
-    x_path = img_path
 
-    x_set = []
+# def test_seq_generator(img_path, batch_size=32, img_size=256):
+    # x_path = img_path
+    #
+    # x_set = []
+    #
+    # for root, dirs, files in os.walk(x_path):
+    #     for file in files:
+    #         if file.endswith(".png"):
+    #             x_set.append(os.path.join(root, file))
+    #
+    # seq = TestSequence(x_set, batch_size, img_size)
+    # return seq
 
-    for root, dirs, files in os.walk(x_path):
+def testGenerator(test_path, target_size=(256, 256), flag_multi_class=False, as_gray=True):
+    file_dict = {}
+    for root, dirs, files in os.walk(test_path):
         for file in files:
-            if file.endswith(".png"):
-                x_set.append(os.path.join(root, file))
+            file_dict[int(file.rstrip(".png"))] = os.path.join(root, file)
 
-    seq = TestSequence(x_set, batch_size, img_size)
-    return seq
+    k_srt = sorted(file_dict.keys())
 
-def save_result(out_path, result):
+    for key in k_srt:
+        img_path = file_dict[key]
+        img = io.imread(img_path, as_gray=as_gray)
+        # img = img / 255
+        img = trans.resize(img, target_size)
+        img = np.reshape(img, img.shape + (1,)) if (not flag_multi_class) else img
+        img = np.reshape(img, (1,) + img.shape)
+        yield img
+
+
+def save_result(out_path, result, postfix):
     for i, item in enumerate(result):
         img = item[:, :, 0]
-        io.imsave(os.path.join(out_path, "%d_predict.png" % i), img)
+        io.imsave(os.path.join(out_path, "%d_pred_%s.png" % (i, postfix)), img)
