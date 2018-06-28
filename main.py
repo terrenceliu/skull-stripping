@@ -22,7 +22,8 @@ class Logger(object):
         # you might want to specify some extra behavior here.
         pass
 
-def train(train_path, img_folder, mask_folder, val_path, val_img_folder, val_mask_folder, weight_path, model_num, epochs, steps):
+def train(train_path, img_folder, mask_folder, val_path, val_img_folder, val_mask_folder, weight_path,
+          model_num, epochs, steps, postfix):
     data_gen_args = dict(rotation_range=0.2,
                          width_shift_range=0.1,
                          height_shift_range=0.1,
@@ -45,7 +46,7 @@ def train(train_path, img_folder, mask_folder, val_path, val_img_folder, val_mas
 
     model = unet() if model_num == 0 else unet2()
 
-    tb_path = "./logs/" + ("%d_ep%d_stp%d" % (model_num, epochs, steps))
+    tb_path = "./logs/" + postfix
     print(tb_path)
 
     if not os.path.exists(tb_path):
@@ -152,7 +153,7 @@ if __name__ == '__main__':
 
     # param_list = [(5, 1500), (10, 500), (10, 1500), (50, 1000), (100, 300), (100, 500), (100, 1000)]
     # param_list = [(10, 500), (10, 1500), (50, 1000), (100, 300), (100, 500), (100, 1000)]
-    param_list = [(50, 500), (50, 1000), (100, 500), (10, 1000), (10, 1500), (200, 300), (200, 1000)]
+    param_list = [(100, 500), (10, 1000), (10, 1500), (200, 300), (200, 1000)]
     for epochs, steps in param_list:
 
         for model_num in [0]:
@@ -178,7 +179,7 @@ if __name__ == '__main__':
             train_start_time = time.time()
 
             train(train_path, train_folder, mask_folder, val_path, val_og_folder, val_mask_folder,
-                  weight_path, model_num, epochs, steps)
+                  weight_path, model_num, epochs, steps, postfix.lstrip("_"))
 
             train_end_time = time.time()
 
