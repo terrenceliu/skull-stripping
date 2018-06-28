@@ -1,12 +1,44 @@
 import numpy as np
 import os
 
-
 from keras.models import Model
 from keras.layers import Input, concatenate, Conv2D, MaxPooling2D, UpSampling2D, Dropout, Conv2DTranspose
 from keras.optimizers import Adam
 from keras.callbacks import ModelCheckpoint, TensorBoard, CSVLogger
 from keras import backend as K
+
+
+def soft_dice(y_true, y_pred):
+    # y_pred is softmax output of shape (num_samples, num_classes)
+    # y_true is one hot encoding of target (shape= (num_samples, num_classes))
+    # intersect = K.sum(y_pred * y_true, 0)
+    # denominator = K.sum(y_pred, 0) + K.sum(y_true, 0)
+    # dice_scores = K.constant(2) * intersect / (denominator + K.constant(1e-6))
+    # return dice_scores
+
+    y_true_f = K.flatten(y_true)
+    y_pred_f = K.flatten(y_pred)
+    intersection = K.sum(y_true_f * y_pred_f)
+    denominator = K.sum(y_true_f) + K.sum(y_pred_f)
+    dice_scores = K.constant(2) * intersection / (denominator + K.constant(1e-6))
+    return dice_scores
+
+
+def soft_dice_loss(y_true, y_pred):
+    return -soft_dice(y_true, y_pred)
+
+
+def dice_coef(y_true, y_pred):
+    smooth = 1
+    y_true_f = K.flatten(y_true)
+    y_pred_f = K.flatten(y_pred)
+    intersection = K.sum(y_true_f * y_pred_f)
+    return (2. * intersection + smooth) / (K.sum(y_true_f) + K.sum(y_pred_f) + smooth)
+
+
+def dice_coef_loss(y_true, y_pred):
+    return -dice_coef(y_true, y_pred)
+
 
 def unet(input_size=(256, 256, 1), pretrained_weights=None):
     """
@@ -68,7 +100,8 @@ def unet(input_size=(256, 256, 1), pretrained_weights=None):
 
     model = Model(inputs=[inputs], outputs=[conv10])
 
-    model.compile(optimizer=Adam(lr=1e-4), loss='binary_crossentropy', metrics=['accuracy'])
+    # model.compile(optimizer=Adam(lr=1e-5), loss='binary_crossentropy', metrics=['accuracy'])
+    model.compile(optimizer=Adam(lr=1e-4), loss=soft_dice_loss, metrics=[soft_dice])
 
     # model.summary()
 
@@ -77,17 +110,6 @@ def unet(input_size=(256, 256, 1), pretrained_weights=None):
 
     return model
 
-
-def dice_coef(y_true, y_pred):
-    smooth = 1
-    y_true_f = K.flatten(y_true)
-    y_pred_f = K.flatten(y_pred)
-    intersection = K.sum(y_true_f * y_pred_f)
-    return (2. * intersection + smooth) / (K.sum(y_true_f) + K.sum(y_pred_f) + smooth)
-
-
-def dice_coef_loss(y_true, y_pred):
-    return -dice_coef(y_true, y_pred)
 
 def unet2(img_rows=256, img_cols=256, pretrained_weights=None):
     inputs = Input((img_rows, img_cols, 1))
@@ -130,6 +152,9 @@ def unet2(img_rows=256, img_cols=256, pretrained_weights=None):
 
     model = Model(inputs=[inputs], outputs=[conv10])
 
-    model.compile(optimizer=Adam(lr=1e-5), loss=dice_coef_loss, metrics=[dice_coef])
+    model.compile(optimizer=Adam(lr=1e-5), loss=soft_dice_loss, metrics=[soft_dice])
+    # model.compile(optimizer=Adam(lr=1e-5), loss='binary_crossentropy', metrics=['accuracy'])
+
+    # model.summary()
 
     return model
