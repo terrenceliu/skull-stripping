@@ -6,6 +6,9 @@ import shutil
 import skimage.io as io
 from skimage import transform
 # import matplotlib.pyplot as plt
+from keras.callbacks import EarlyStopping
+import multiprocessing
+
 
 class Logger(object):
     def __init__(self, path):
@@ -54,10 +57,11 @@ def train(train_path, img_folder, mask_folder, val_path, val_img_folder, val_mas
         os.mkdir(tb_path)
 
     tensorboard = TensorBoard(log_dir=tb_path, histogram_freq=0, write_graph=True, write_images=True)
+    early_stopping = EarlyStopping(monitor='loss', min_delta=0.00001, patience=0, verbose=1, mode="min")
 
     model_checkpoint = ModelCheckpoint(weight_path, monitor='loss', verbose=1, save_best_only=True)
     history = model.fit_generator(seq, validation_data=validata, validation_steps=100, steps_per_epoch=steps, epochs=epochs,
-                                  callbacks=[model_checkpoint, tensorboard], workers=8)
+                                      callbacks=[model_checkpoint, tensorboard, early_stopping], workers=multiprocessing.cpu_count())
 
     # GC
     del model
@@ -164,7 +168,7 @@ if __name__ == '__main__':
             Config
             """
 
-            postfix = "_%d_ep%d_stp%d_td3" % (model_num, epochs, steps)
+            postfix = "_%d_ep%d_stp%d_tacc" % (model_num, epochs, steps)
 
             print("*" * 30)
             print(postfix)
