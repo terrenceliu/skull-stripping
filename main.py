@@ -39,7 +39,7 @@ def train(train_path, img_folder, mask_folder, val_path, val_img_folder, val_mas
                             data_gen_args,
                             save_to_dir=None)
 
-    validate = valGenerator(2, val_path,
+    validata = valGenerator(2, val_path,
                                 val_img_folder,
                                 val_mask_folder,
                                 data_gen_args, save_to_dir=None)
@@ -55,8 +55,8 @@ def train(train_path, img_folder, mask_folder, val_path, val_img_folder, val_mas
     tensorboard = TensorBoard(log_dir=tb_path, histogram_freq=0, write_graph=True, write_images=True)
 
     model_checkpoint = ModelCheckpoint(weight_path, monitor='loss', verbose=1, save_best_only=True)
-    history = model.fit_generator(seq, validation_data=validate, validation_steps=100, steps_per_epoch=steps, epochs=epochs,
-                                  callbacks=[model_checkpoint, tensorboard], workers=4)
+    history = model.fit_generator(seq, validation_data=validata, validation_steps=100, steps_per_epoch=steps, epochs=epochs,
+                                  callbacks=[model_checkpoint, tensorboard], workers=8)
 
     # GC
     del model
@@ -133,11 +133,11 @@ if __name__ == '__main__':
     """
     File Paths
     """
-    train_path = ".\\data\\train_data"
+    train_path = "./data/train_data"
     train_folder = "origin"
     mask_folder = "mask"
 
-    val_path = ".\\data\\val_data"
+    val_path = "./data/val_data"
     val_og_folder = "origin"
     val_mask_folder = "mask"
 
@@ -153,7 +153,7 @@ if __name__ == '__main__':
 
     # param_list = [(5, 1500), (10, 500), (10, 1500), (50, 1000), (100, 300), (100, 500), (100, 1000)]
     # param_list = [(10, 500), (10, 1500), (50, 1000), (100, 300), (100, 500), (100, 1000)]
-    param_list = [(100, 500), (10, 1000), (10, 1500), (200, 300), (200, 1000)]
+    param_list = [(50, 1000), (80, 1000), (100, 1000), (100, 2000)]
     for epochs, steps in param_list:
 
         for model_num in [0]:
@@ -163,14 +163,14 @@ if __name__ == '__main__':
             Config
             """
 
-            postfix = "_%d_ep%d_stp%d_sfd" % (model_num, epochs, steps)
+            postfix = "_%d_ep%d_stp%d_td3" % (model_num, epochs, steps)
 
             print("*" * 30)
             print(postfix)
 
-            weight_path = ".\\data\\weights\\unet" + postfix + ".h5"
+            weight_path = "./data/weights/unet" + postfix + ".h5"
 
-            # sys.stdout = Logger(".\\logs\\" + postfix + ".txt")
+            # sys.stdout = Logger("./logs/" + postfix + ".txt")
 
 
             """
@@ -193,8 +193,8 @@ if __name__ == '__main__':
             """
             File Path
             """
-            test_path = ".\\data\\test_data"
-            out_path = ".\\data\\output\\test" + postfix
+            test_path = "./data/test_data"
+            out_path = "./data/output/test" + postfix
 
             if not os.path.exists(out_path):
                 os.mkdir(out_path)

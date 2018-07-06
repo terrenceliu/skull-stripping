@@ -77,16 +77,15 @@ if __name__ == '__main__':
     """
     File Path
     """
+    postfix = "_0_ep100_stp2000_td3"
 
-    postfix = "_0_ep50_stp1000_sfd"
-
-    test_path = ".\\data\\test_data"
-    out_path = ".\\data\\output\\test" + postfix
+    test_path = "./data/test_data"
+    out_path = "./data/output/test" + postfix + "_seq2"
 
     if not os.path.exists(out_path):
         os.mkdir(out_path)
 
-    weight_path = ".\\data\\weights\\unet" + postfix + ".h5"
+    weight_path = "./data/weights/unet" + postfix + ".h5"
 
     model_num = postfix.split("_")[1]
     model_num = int(model_num)
