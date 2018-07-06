@@ -2,10 +2,10 @@
 
 #SBATCH -J skstrp
 #SBATCH -o ./output/skstrp.%j.out
-#SBATCH -p gpu
+#SBATCH -p gpu-long
 #SBATCH -N 1
 #SBATCH -n 1
-#SBATCH -t 00:01:00
+#SBATCH -t 48:00:00
 #SBATCH --mail-user=yliu30@mdanderson.org
 #SBATCH --mail-type=begin
 #SBATCH --mail-type=end
