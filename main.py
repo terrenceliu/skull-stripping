@@ -48,6 +48,7 @@ def train(train_path, img_folder, mask_folder, val_path, val_img_folder, val_mas
 
     tb_path = "./logs/" + postfix
     print(tb_path)
+    print("pwd: ", os.getcwd())
 
     if not os.path.exists(tb_path):
         os.mkdir(tb_path)
