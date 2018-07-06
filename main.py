@@ -5,7 +5,7 @@ import sys
 import shutil
 import skimage.io as io
 from skimage import transform
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
 class Logger(object):
     def __init__(self, path):
@@ -213,7 +213,7 @@ if __name__ == '__main__':
             """
             Post Process
             """
-            post_process(test_path, out_path)
+            # post_process(test_path, out_path)
 
 
 
