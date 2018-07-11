@@ -43,7 +43,7 @@ def dice_coef_loss(y_true, y_pred):
 def unet(input_size=(256, 256, 1), pretrained_weights=None):
     """
     Return the U-Net model. Default input_size = (256, 256, 1)
-
+    
     :param input_size:
     :param pretrained_weights:
     :return:
