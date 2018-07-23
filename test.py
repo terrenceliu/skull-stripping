@@ -77,7 +77,7 @@ if __name__ == '__main__':
     """
     File Path
     """
-    postfix = "_0_ep50_stp1000_td3"
+    postfix = "_0_ep100_stp2000_td3"
 
     test_path = "./data/test_data"
     out_path = "./data/output/test" + postfix + "_seq2"

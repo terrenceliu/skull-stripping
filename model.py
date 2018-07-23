@@ -103,7 +103,7 @@ def unet(input_size=(256, 256, 1), pretrained_weights=None):
     # model.compile(optimizer=Adam(lr=1e-5), loss='binary_crossentropy', metrics=['accuracy'])
     model.compile(optimizer=Adam(lr=1e-4), loss=soft_dice_loss, metrics=[soft_dice])
 
-    model.summary()
+    # model.summary()
 
     if (pretrained_weights):
         model.load_weights(pretrained_weights)

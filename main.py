@@ -39,7 +39,8 @@ def train(train_path, img_folder, mask_folder, val_path, val_img_folder, val_mas
     seq = trainGenerator(2, train_path,
                             img_folder,
                             mask_folder,
-                            data_gen_args)
+                            data_gen_args,
+                            save_to_dir=None)
 
     validata = valGenerator(2, val_path,
                                 val_img_folder,
